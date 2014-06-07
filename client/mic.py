@@ -22,7 +22,7 @@ class Mic:
     speechRec = None
     speechRec_persona = None
 
-    def __init__(self, lmd, dictd, lmd_persona, dictd_persona, lmd_music=None, dictd_music=None):
+    def __init__(self, lmd, dictd, lmd_persona, dictd_persona):
         """
             Initiates the pocketsphinx instance.
 
@@ -35,29 +35,22 @@ class Mic:
 
         hmdir = "/usr/local/share/pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k"
 
-        if lmd_music and dictd_music:
-            self.speechRec_music = ps.Decoder(hmm = hmdir, lm = lmd_music, dict = dictd_music)
-        self.speechRec_persona = ps.Decoder(
-            hmm=hmdir, lm=lmd_persona, dict=dictd_persona)
+        self.speechRec_persona = ps.Decoder(hmm=hmdir, lm=lmd_persona, dict=dictd_persona)
         self.speechRec = ps.Decoder(hmm=hmdir, lm=lmd, dict=dictd)
 
-    def transcribe(self, audio_file_path, PERSONA_ONLY=False, MUSIC=False):
+    def transcribe(self, audio_file_path, PERSONA_ONLY=False):
         """
             Performs TTS, transcribing an audio file and returning the result.
 
             Arguments:
             audio_file_path -- the path to the audio file to-be transcribed
             PERSONA_ONLY -- if True, uses the 'Persona' language model and dictionary
-            MUSIC -- if True, uses the 'Music' language model and dictionary
         """
 
         wavFile = file(audio_file_path, 'rb')
         wavFile.seek(44)
 
-        if MUSIC:
-            self.speechRec_music.decode_raw(wavFile)
-            result = self.speechRec_music.get_hyp()
-        elif PERSONA_ONLY:
+        if PERSONA_ONLY:
             self.speechRec_persona.decode_raw(wavFile)
             result = self.speechRec_persona.get_hyp()
         else:
@@ -216,7 +209,7 @@ class Mic:
 
         return (False, transcribed)
 
-    def activeListen(self, THRESHOLD=None, LISTEN=True, MUSIC=False):
+    def activeListen(self, THRESHOLD=None, LISTEN=True):
         """
             Records until a second of silence or times out after 12 seconds
         """
@@ -282,9 +275,6 @@ class Mic:
 
         # DO SOME AMPLIFICATION
         # os.system("sox "+AUDIO_FILE+" temp.wav vol 20dB")
-
-        if MUSIC:
-            return self.transcribe(AUDIO_FILE, MUSIC=True)
 
         return self.transcribe(AUDIO_FILE)
 

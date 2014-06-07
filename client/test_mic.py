@@ -15,7 +15,7 @@ class Mic:
     def passiveListen(self, PERSONA):
         return True, "JASPER"
 
-    def activeListen(self, THRESHOLD=None, LISTEN=True, MUSIC=False):
+    def activeListen(self, THRESHOLD=None, LISTEN=True):
         if not LISTEN:
             return self.inputs[self.idx - 1]
 
